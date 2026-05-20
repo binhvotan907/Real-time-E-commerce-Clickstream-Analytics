@@ -1,0 +1,24 @@
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: zookeeper
+    ports:
+      - "2181:2181" # cổng để kafka và clien nội bộ kết nối tới zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181 # cổng clien mặc định
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka
+    depends_on:
+      - zookeeper # kafka chỉ khởi động sau khi zookeeper sẵn sàng
+    ports:
+      - "9092:9092" # cổng để Producer/Consumer bên ngoài Docker kết nối
+    environment:
+      KAFKA_BROKER_ID: 1 # id
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181 # kết nối thông qua service name
+
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092 
+
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
